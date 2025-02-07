@@ -33,13 +33,11 @@ public class JobTriggerPoolHelper
     }
 
     /**
-     * @param jobId
-     * @param triggerType
-     * @param failRetryCount        >=0: use this param
-     *                              <0: use param from job info config
-     * @param executorShardingParam
-     * @param executorParam         null: use job param
-     *                              not null: cover job param
+     * @param jobId                 任务主键
+     * @param triggerType           触发类型
+     * @param failRetryCount        大于等于 0: use this param; 小于 0: use param from job info config
+     * @param executorShardingParam 执行器分片参数
+     * @param executorParam         空: use job param; 非空: cover job param
      */
     public static void trigger(int jobId,
                                TriggerTypeEnum triggerType,
@@ -99,15 +97,17 @@ public class JobTriggerPoolHelper
                            final String addressList)
     {
         // choose thread pool
+        // 1 分钟超时 > 10 次, 使用慢线程池
         ThreadPoolExecutor triggerPool_    = fastTriggerPool;
         AtomicInteger      jobTimeoutCount = jobTimeoutCountMap.get(jobId);
         if (jobTimeoutCount != null && jobTimeoutCount.get() > 10)
-        {      
+        {
             // job-timeout 10 times in 1 min
             triggerPool_ = slowTriggerPool;
         }
 
         // trigger
+        // XxlJobTrigger.trigger 超过 500 ms, 自增超时次数
         triggerPool_.execute(
                 () ->
                 {
