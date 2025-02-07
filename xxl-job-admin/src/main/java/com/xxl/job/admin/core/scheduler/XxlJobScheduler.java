@@ -16,38 +16,38 @@ import java.util.concurrent.ConcurrentMap;
  * @author xuxueli 2018-10-28 00:18:17
  */
 
-public class XxlJobScheduler  {
+public class XxlJobScheduler
+{
     private static final Logger logger = LoggerFactory.getLogger(XxlJobScheduler.class);
 
-
-    public void init() throws Exception {
+    public void init() throws Exception
+    {
         // init i18n
         initI18n();
 
-        // admin trigger pool start
+        // 触发池 admin trigger pool start
         JobTriggerPoolHelper.toStart();
 
-        // admin registry monitor run
+        // 注册监控 admin registry monitor run
         JobRegistryHelper.getInstance().start();
 
-        // admin fail-monitor run
+        // 失败监控 admin fail-monitor run
         JobFailMonitorHelper.getInstance().start();
 
-        // admin lose-monitor run ( depend on JobTriggerPoolHelper )
+        // 丢失监控 admin lose-monitor run ( depend on JobTriggerPoolHelper )
         JobCompleteHelper.getInstance().start();
 
-        // admin log report start
+        // 日志报告 admin log report start
         JobLogReportHelper.getInstance().start();
 
-        // start-schedule  ( depend on JobTriggerPoolHelper )
+        // 任务调度 start-schedule  ( depend on JobTriggerPoolHelper )
         JobScheduleHelper.getInstance().start();
 
         logger.info(">>>>>>>>> init xxl-job admin success.");
     }
 
-    
-    public void destroy() throws Exception {
-
+    public void destroy()
+    {
         // stop-schedule
         JobScheduleHelper.getInstance().toStop();
 
@@ -70,24 +70,31 @@ public class XxlJobScheduler  {
 
     // ---------------------- I18n ----------------------
 
-    private void initI18n(){
-        for (ExecutorBlockStrategyEnum item:ExecutorBlockStrategyEnum.values()) {
+    private void initI18n()
+    {
+        for (ExecutorBlockStrategyEnum item : ExecutorBlockStrategyEnum.values())
+        {
             item.setTitle(I18nUtil.getString("jobconf_block_".concat(item.name())));
         }
     }
 
     // ---------------------- executor-client ----------------------
-    private static ConcurrentMap<String, ExecutorBiz> executorBizRepository = new ConcurrentHashMap<String, ExecutorBiz>();
-    public static ExecutorBiz getExecutorBiz(String address) throws Exception {
+
+    private static final ConcurrentMap<String, ExecutorBiz> executorBizRepository = new ConcurrentHashMap<>();
+
+    public static ExecutorBiz getExecutorBiz(String address)
+    {
         // valid
-        if (address==null || address.trim().length()==0) {
+        if (address == null || address.trim().isEmpty())
+        {
             return null;
         }
 
         // load-cache
         address = address.trim();
         ExecutorBiz executorBiz = executorBizRepository.get(address);
-        if (executorBiz != null) {
+        if (executorBiz != null)
+        {
             return executorBiz;
         }
 
@@ -97,5 +104,4 @@ public class XxlJobScheduler  {
         executorBizRepository.put(address, executorBiz);
         return executorBiz;
     }
-
 }
