@@ -5,7 +5,8 @@ import com.xxl.job.admin.core.util.I18nUtil;
 /**
  * @author xuxueli 2020-10-29 21:11:23
  */
-public enum ScheduleTypeEnum {
+public enum ScheduleTypeEnum
+{
 
     NONE(I18nUtil.getString("schedule_type_none")),
 
@@ -24,23 +25,27 @@ public enum ScheduleTypeEnum {
      */
     /*FIX_DELAY(I18nUtil.getString("schedule_type_fix_delay"))*/;
 
-    private String title;
+    private final String title;
 
-    ScheduleTypeEnum(String title) {
+    ScheduleTypeEnum(String title)
+    {
         this.title = title;
     }
 
-    public String getTitle() {
+    public String getTitle()
+    {
         return title;
     }
 
-    public static ScheduleTypeEnum match(String name, ScheduleTypeEnum defaultItem){
-        for (ScheduleTypeEnum item: ScheduleTypeEnum.values()) {
-            if (item.name().equals(name)) {
+    public static ScheduleTypeEnum match(String name, ScheduleTypeEnum defaultItem)
+    {
+        for (ScheduleTypeEnum item : ScheduleTypeEnum.values())
+        {
+            if (item.name().equals(name))
+            {
                 return item;
             }
         }
         return defaultItem;
     }
-
 }
