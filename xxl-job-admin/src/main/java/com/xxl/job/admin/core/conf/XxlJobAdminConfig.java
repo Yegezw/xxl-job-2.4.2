@@ -20,20 +20,23 @@ import java.util.Arrays;
  */
 
 @Component
-public class XxlJobAdminConfig implements InitializingBean, DisposableBean {
+public class XxlJobAdminConfig implements InitializingBean, DisposableBean
+{
 
     private static XxlJobAdminConfig adminConfig = null;
-    public static XxlJobAdminConfig getAdminConfig() {
+
+    public static XxlJobAdminConfig getAdminConfig()
+    {
         return adminConfig;
     }
-
 
     // ---------------------- XxlJobScheduler ----------------------
 
     private XxlJobScheduler xxlJobScheduler;
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() throws Exception
+    {
         adminConfig = this;
 
         xxlJobScheduler = new XxlJobScheduler();
@@ -41,14 +44,15 @@ public class XxlJobAdminConfig implements InitializingBean, DisposableBean {
     }
 
     @Override
-    public void destroy() throws Exception {
+    public void destroy() throws Exception
+    {
         xxlJobScheduler.destroy();
     }
-
 
     // ---------------------- XxlJobScheduler ----------------------
 
     // conf
+
     @Value("${xxl.job.i18n}")
     private String i18n;
 
@@ -64,94 +68,111 @@ public class XxlJobAdminConfig implements InitializingBean, DisposableBean {
     @Value("${xxl.job.triggerpool.slow.max}")
     private int triggerPoolSlowMax;
 
-    @Value("${xxl.job.logretentiondays}")
-    private int logretentiondays;
+    @Value("${xxl.job.logRetentionDays}")
+    private int logRetentionDays;
 
-    // dao, service
-
-    @Resource
-    private XxlJobLogDao xxlJobLogDao;
-    @Resource
-    private XxlJobInfoDao xxlJobInfoDao;
-    @Resource
-    private XxlJobRegistryDao xxlJobRegistryDao;
-    @Resource
-    private XxlJobGroupDao xxlJobGroupDao;
-    @Resource
-    private XxlJobLogReportDao xxlJobLogReportDao;
-    @Resource
-    private JavaMailSender mailSender;
-    @Resource
-    private DataSource dataSource;
-    @Resource
-    private JobAlarmer jobAlarmer;
-
-
-    public String getI18n() {
-        if (!Arrays.asList("zh_CN", "zh_TC", "en").contains(i18n)) {
+    public String getI18n()
+    {
+        if (!Arrays.asList("zh_CN", "zh_TC", "en").contains(i18n))
+        {
             return "zh_CN";
         }
         return i18n;
     }
 
-    public String getAccessToken() {
+    public String getAccessToken()
+    {
         return accessToken;
     }
 
-    public String getEmailFrom() {
+    public String getEmailFrom()
+    {
         return emailFrom;
     }
 
-    public int getTriggerPoolFastMax() {
-        if (triggerPoolFastMax < 200) {
+    public int getTriggerPoolFastMax()
+    {
+        if (triggerPoolFastMax < 200)
+        {
             return 200;
         }
         return triggerPoolFastMax;
     }
 
-    public int getTriggerPoolSlowMax() {
-        if (triggerPoolSlowMax < 100) {
+    public int getTriggerPoolSlowMax()
+    {
+        if (triggerPoolSlowMax < 100)
+        {
             return 100;
         }
         return triggerPoolSlowMax;
     }
 
-    public int getLogretentiondays() {
-        if (logretentiondays < 7) {
+    public int getLogRetentionDays()
+    {
+        if (logRetentionDays < 7)
+        {
             return -1;  // Limit greater than or equal to 7, otherwise close
         }
-        return logretentiondays;
+        return logRetentionDays;
     }
 
-    public XxlJobLogDao getXxlJobLogDao() {
+    // dao, service
+
+    @Resource
+    private XxlJobLogDao       xxlJobLogDao;
+    @Resource
+    private XxlJobInfoDao      xxlJobInfoDao;
+    @Resource
+    private XxlJobRegistryDao  xxlJobRegistryDao;
+    @Resource
+    private XxlJobGroupDao     xxlJobGroupDao;
+    @Resource
+    private XxlJobLogReportDao xxlJobLogReportDao;
+    @Resource
+    private JavaMailSender     mailSender;
+    @Resource
+    private DataSource         dataSource;
+    @Resource
+    private JobAlarmer         jobAlarmer;
+
+    public XxlJobLogDao getXxlJobLogDao()
+    {
         return xxlJobLogDao;
     }
 
-    public XxlJobInfoDao getXxlJobInfoDao() {
+    public XxlJobInfoDao getXxlJobInfoDao()
+    {
         return xxlJobInfoDao;
     }
 
-    public XxlJobRegistryDao getXxlJobRegistryDao() {
+    public XxlJobRegistryDao getXxlJobRegistryDao()
+    {
         return xxlJobRegistryDao;
     }
 
-    public XxlJobGroupDao getXxlJobGroupDao() {
+    public XxlJobGroupDao getXxlJobGroupDao()
+    {
         return xxlJobGroupDao;
     }
 
-    public XxlJobLogReportDao getXxlJobLogReportDao() {
+    public XxlJobLogReportDao getXxlJobLogReportDao()
+    {
         return xxlJobLogReportDao;
     }
 
-    public JavaMailSender getMailSender() {
+    public JavaMailSender getMailSender()
+    {
         return mailSender;
     }
 
-    public DataSource getDataSource() {
+    public DataSource getDataSource()
+    {
         return dataSource;
     }
 
-    public JobAlarmer getJobAlarmer() {
+    public JobAlarmer getJobAlarmer()
+    {
         return jobAlarmer;
     }
 
