@@ -27,17 +27,12 @@ public class XxlJobTrigger
     private static final Logger logger = LoggerFactory.getLogger(XxlJobTrigger.class);
 
     /**
-     * trigger job
-     *
-     * @param jobId
-     * @param triggerType
-     * @param failRetryCount        >=0: use this param
-     *                              <0: use param from job info config
-     * @param executorShardingParam
-     * @param executorParam         null: use job param
-     *                              not null: cover job param
-     * @param addressList           null: use executor addressList
-     *                              not null: cover
+     * @param jobId                 任务主键
+     * @param triggerType           触发类型
+     * @param failRetryCount        大于等于 0: use this param; 小于 0: use param from job info config
+     * @param executorShardingParam 执行器分片参数
+     * @param executorParam         空: use job param; 非空: cover job param
+     * @param addressList           空: use executor addressList; 非空: cover
      */
     public static void trigger(int jobId,
                                TriggerTypeEnum triggerType,
@@ -46,7 +41,6 @@ public class XxlJobTrigger
                                String executorParam,
                                String addressList)
     {
-
         // load data
         XxlJobInfo jobInfo = XxlJobAdminConfig.getAdminConfig().getXxlJobInfoDao().loadById(jobId);
         if (jobInfo == null)
@@ -61,8 +55,8 @@ public class XxlJobTrigger
         int         finalFailRetryCount = failRetryCount >= 0 ? failRetryCount : jobInfo.getExecutorFailRetryCount();
         XxlJobGroup group               = XxlJobAdminConfig.getAdminConfig().getXxlJobGroupDao().load(jobInfo.getJobGroup());
 
-        // cover addressList
-        if (addressList != null && addressList.trim().length() > 0)
+        // cover addressList 手动录入
+        if (addressList != null && !addressList.trim().isEmpty())
         {
             group.setAddressType(1);
             group.setAddressList(addressList.trim());
@@ -76,8 +70,8 @@ public class XxlJobTrigger
             if (shardingArr.length == 2 && isNumeric(shardingArr[0]) && isNumeric(shardingArr[1]))
             {
                 shardingParam    = new int[2];
-                shardingParam[0] = Integer.valueOf(shardingArr[0]);
-                shardingParam[1] = Integer.valueOf(shardingArr[1]);
+                shardingParam[0] = Integer.parseInt(shardingArr[0]);
+                shardingParam[1] = Integer.parseInt(shardingArr[1]);
             }
         }
         if (ExecutorRouteStrategyEnum.SHARDING_BROADCAST == ExecutorRouteStrategyEnum.match(jobInfo.getExecutorRouteStrategy(), null)
@@ -97,7 +91,6 @@ public class XxlJobTrigger
             }
             processTrigger(group, jobInfo, finalFailRetryCount, triggerType, shardingParam[0], shardingParam[1]);
         }
-
     }
 
     private static boolean isNumeric(String str)
@@ -123,12 +116,12 @@ public class XxlJobTrigger
      */
     private static void processTrigger(XxlJobGroup group, XxlJobInfo jobInfo, int finalFailRetryCount, TriggerTypeEnum triggerType, int index, int total)
     {
-        // param
+        // param 触发参数
         ExecutorBlockStrategyEnum blockStrategy             = ExecutorBlockStrategyEnum.match(jobInfo.getExecutorBlockStrategy(), ExecutorBlockStrategyEnum.SERIAL_EXECUTION);  // block strategy
         ExecutorRouteStrategyEnum executorRouteStrategyEnum = ExecutorRouteStrategyEnum.match(jobInfo.getExecutorRouteStrategy(), null);    // route strategy
         String                    shardingParam             = (ExecutorRouteStrategyEnum.SHARDING_BROADCAST == executorRouteStrategyEnum) ? String.valueOf(index).concat("/").concat(String.valueOf(total)) : null;
 
-        // 1、save log-id
+        // 1、save log-id 保存触发日志
         XxlJobLog jobLog = new XxlJobLog();
         jobLog.setJobGroup(jobInfo.getJobGroup());
         jobLog.setJobId(jobInfo.getId());
@@ -136,7 +129,7 @@ public class XxlJobTrigger
         XxlJobAdminConfig.getAdminConfig().getXxlJobLogDao().save(jobLog);
         logger.debug(">>>>>>>>>>> xxl-job trigger start, jobId:{}", jobLog.getId());
 
-        // 2、init trigger-param
+        // 2、init trigger-param 初始化触发参数
         TriggerParam triggerParam = new TriggerParam();
         triggerParam.setJobId(jobInfo.getId());
         triggerParam.setExecutorHandler(jobInfo.getExecutorHandler());
@@ -147,11 +140,11 @@ public class XxlJobTrigger
         triggerParam.setLogDateTime(jobLog.getTriggerTime().getTime());
         triggerParam.setGlueType(jobInfo.getGlueType());
         triggerParam.setGlueSource(jobInfo.getGlueSource());
-        triggerParam.setGlueUpdatetime(jobInfo.getGlueUpdatetime().getTime());
+        triggerParam.setGlueUpdateTime(jobInfo.getGlueUpdatetime().getTime());
         triggerParam.setBroadcastIndex(index);
         triggerParam.setBroadcastTotal(total);
 
-        // 3、init address
+        // 3、init address 初始化触发地址
         String          address            = null;
         ReturnT<String> routeAddressResult = null;
         if (group.getRegistryList() != null && !group.getRegistryList().isEmpty())
@@ -178,10 +171,10 @@ public class XxlJobTrigger
         }
         else
         {
-            routeAddressResult = new ReturnT<String>(ReturnT.FAIL_CODE, I18nUtil.getString("jobconf_trigger_address_empty"));
+            routeAddressResult = new ReturnT<>(ReturnT.FAIL_CODE, I18nUtil.getString("jobconf_trigger_address_empty"));
         }
 
-        // 4、trigger remote executor
+        // 4、trigger remote executor 触发远程执行器
         ReturnT<String> triggerResult;
         if (address != null)
         {
@@ -192,7 +185,7 @@ public class XxlJobTrigger
             triggerResult = new ReturnT<>(ReturnT.FAIL_CODE, null);
         }
 
-        // 5、collection trigger info
+        // 5、collection trigger info 收集触发信息
         StringBuilder triggerMsgSb = new StringBuilder();
         triggerMsgSb.append(I18nUtil.getString("jobconf_trigger_type")).append("：").append(triggerType.getTitle());
         triggerMsgSb.append("<br>").append(I18nUtil.getString("jobconf_trigger_admin_adress")).append("：").append(IpUtil.getIp());
@@ -211,7 +204,7 @@ public class XxlJobTrigger
         triggerMsgSb.append("<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_run") + "<<<<<<<<<<< </span><br>")
                 .append((routeAddressResult != null && routeAddressResult.getMsg() != null) ? routeAddressResult.getMsg() + "<br><br>" : "").append(triggerResult.getMsg() != null ? triggerResult.getMsg() : "");
 
-        // 6、save log trigger-info
+        // 6、save log trigger-info 更新触发日志
         jobLog.setExecutorAddress(address);
         jobLog.setExecutorHandler(jobInfo.getExecutorHandler());
         jobLog.setExecutorParam(jobInfo.getExecutorParam());
