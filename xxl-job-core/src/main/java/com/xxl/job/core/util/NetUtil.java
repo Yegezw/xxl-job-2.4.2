@@ -11,8 +11,9 @@ import java.net.ServerSocket;
  *
  * @author xuxueli 2017-11-29 17:00:25
  */
-public class NetUtil {
-    private static Logger logger = LoggerFactory.getLogger(NetUtil.class);
+public class NetUtil
+{
+    private static final Logger logger = LoggerFactory.getLogger(NetUtil.class);
 
     /**
      * find avaliable port
@@ -20,20 +21,29 @@ public class NetUtil {
      * @param defaultPort
      * @return
      */
-    public static int findAvailablePort(int defaultPort) {
+    public static int findAvailablePort(int defaultPort)
+    {
         int portTmp = defaultPort;
-        while (portTmp < 65535) {
-            if (!isPortUsed(portTmp)) {
+        while (portTmp < 65535)
+        {
+            if (isPortNotUsed(portTmp))
+            {
                 return portTmp;
-            } else {
+            }
+            else
+            {
                 portTmp++;
             }
         }
-        portTmp = defaultPort--;
-        while (portTmp > 0) {
-            if (!isPortUsed(portTmp)) {
+        portTmp = --defaultPort;
+        while (portTmp > 0)
+        {
+            if (isPortNotUsed(portTmp))
+            {
                 return portTmp;
-            } else {
+            }
+            else
+            {
                 portTmp--;
             }
         }
@@ -41,30 +51,38 @@ public class NetUtil {
     }
 
     /**
-     * check port used
+     * check port not used
      *
-     * @param port
-     * @return
+     * @param port 端口
+     * @return 未被使用 ? true : false
      */
-    public static boolean isPortUsed(int port) {
-        boolean used = false;
+    public static boolean isPortNotUsed(int port)
+    {
+        boolean      unused       = true;
         ServerSocket serverSocket = null;
-        try {
+        try
+        {
             serverSocket = new ServerSocket(port);
-            used = false;
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             logger.info(">>>>>>>>>>> xxl-job, port[{}] is in use.", port);
-            used = true;
-        } finally {
-            if (serverSocket != null) {
-                try {
+            unused = false;
+        }
+        finally
+        {
+            if (serverSocket != null)
+            {
+                try
+                {
                     serverSocket.close();
-                } catch (IOException e) {
+                }
+                catch (IOException e)
+                {
                     logger.info("");
                 }
             }
         }
-        return used;
+        return unused;
     }
-
 }

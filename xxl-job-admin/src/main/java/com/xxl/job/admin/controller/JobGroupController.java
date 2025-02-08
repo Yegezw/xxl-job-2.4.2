@@ -156,7 +156,7 @@ public class JobGroupController {
 		List<XxlJobRegistry> list = xxlJobRegistryDao.findAll(RegistryConfig.DEAD_TIMEOUT, new Date());
 		if (list != null) {
 			for (XxlJobRegistry item: list) {
-				if (RegistryConfig.RegistType.EXECUTOR.name().equals(item.getRegistryGroup())) {
+				if (RegistryConfig.RegistryType.EXECUTOR.name().equals(item.getRegistryGroup())) {
 					String appname = item.getRegistryKey();
 					List<String> registryList = appAddressMap.get(appname);
 					if (registryList == null) {

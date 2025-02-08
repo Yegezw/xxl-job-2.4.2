@@ -50,7 +50,7 @@ public class AdminBizTest {
     public void registry() throws Exception {
         AdminBiz adminBiz = new AdminBizClient(addressUrl, accessToken);
 
-        RegistryParam registryParam = new RegistryParam(RegistryConfig.RegistType.EXECUTOR.name(), "xxl-job-executor-example", "127.0.0.1:9999");
+        RegistryParam registryParam = new RegistryParam(RegistryConfig.RegistryType.EXECUTOR.name(), "xxl-job-executor-example", "127.0.0.1:9999");
         ReturnT<String> returnT = adminBiz.registry(registryParam);
 
         assertTrue(returnT.getCode() == ReturnT.SUCCESS_CODE);
@@ -65,7 +65,7 @@ public class AdminBizTest {
     public void registryRemove() throws Exception {
         AdminBiz adminBiz = new AdminBizClient(addressUrl, accessToken);
 
-        RegistryParam registryParam = new RegistryParam(RegistryConfig.RegistType.EXECUTOR.name(), "xxl-job-executor-example", "127.0.0.1:9999");
+        RegistryParam registryParam = new RegistryParam(RegistryConfig.RegistryType.EXECUTOR.name(), "xxl-job-executor-example", "127.0.0.1:9999");
         ReturnT<String> returnT = adminBiz.registryRemove(registryParam);
 
         assertTrue(returnT.getCode() == ReturnT.SUCCESS_CODE);
