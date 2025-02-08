@@ -69,7 +69,7 @@ public class EmbedServer
                                                         .addLast(new IdleStateHandler(0, 0, 30 * 3, TimeUnit.SECONDS))  // beat 3N, close if idle
                                                         .addLast(new HttpServerCodec())
                                                         .addLast(new HttpObjectAggregator(5 * 1024 * 1024))  // merge request & response to FULL
-                                                        .addLast(new EmbedHttpServerHandler(executorBiz, accessToken, bizThreadPool)); // core
+                                                        .addLast(new EmbedHttpServerHandler(executorBiz, accessToken, bizThreadPool)); // core 接收 TriggerParam 并执行
                                             }
                                         }
                                 )
@@ -81,6 +81,7 @@ public class EmbedServer
                         logger.info(">>>>>>>>>>> xxl-job remoting server start success, nettype = {}, port = {}", EmbedServer.class, port);
 
                         // start registry
+                        // 向 client 注册 RegistryParam
                         startRegistry(appname, address);
 
                         // wait util stop
@@ -207,6 +208,7 @@ public class EmbedServer
                         IdleBeatParam idleBeatParam = GsonTool.fromJson(requestData, IdleBeatParam.class);
                         return executorBiz.idleBeat(idleBeatParam);
                     case "/run":
+                        // 接收 TriggerParam 并执行
                         TriggerParam triggerParam = GsonTool.fromJson(requestData, TriggerParam.class);
                         return executorBiz.run(triggerParam);
                     case "/kill":
