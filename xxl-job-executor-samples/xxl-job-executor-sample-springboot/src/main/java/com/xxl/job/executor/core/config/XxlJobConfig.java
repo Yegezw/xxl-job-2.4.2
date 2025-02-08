@@ -13,8 +13,9 @@ import org.springframework.context.annotation.Configuration;
  * @author xuxueli 2017-04-28
  */
 @Configuration
-public class XxlJobConfig {
-    private Logger logger = LoggerFactory.getLogger(XxlJobConfig.class);
+public class XxlJobConfig
+{
+    private final Logger logger = LoggerFactory.getLogger(XxlJobConfig.class);
 
     @Value("${xxl.job.admin.addresses}")
     private String adminAddresses;
@@ -40,9 +41,9 @@ public class XxlJobConfig {
     @Value("${xxl.job.executor.logretentiondays}")
     private int logRetentionDays;
 
-
     @Bean
-    public XxlJobSpringExecutor xxlJobExecutor() {
+    public XxlJobSpringExecutor xxlJobExecutor()
+    {
         logger.info(">>>>>>>>>>> xxl-job config init.");
         XxlJobSpringExecutor xxlJobSpringExecutor = new XxlJobSpringExecutor();
         xxlJobSpringExecutor.setAdminAddresses(adminAddresses);
@@ -57,8 +58,8 @@ public class XxlJobConfig {
         return xxlJobSpringExecutor;
     }
 
-    /**
-     * 针对多网卡、容器内部署等情况，可借助 "spring-cloud-commons" 提供的 "InetUtils" 组件灵活定制注册IP；
+    /*
+     * 针对多网卡、容器内部署等情况，可借助 "spring-cloud-commons" 提供的 "InetUtils" 组件灵活定制注册 IP
      *
      *      1、引入依赖：
      *          <dependency>
@@ -73,6 +74,4 @@ public class XxlJobConfig {
      *      3、获取IP
      *          String ip_ = inetUtils.findFirstNonLoopbackHostInfo().getIpAddress();
      */
-
-
 }
