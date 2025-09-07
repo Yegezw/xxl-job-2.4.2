@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trees>
+    <tree path="/xxl-job-admin" title="调度中心"/>
+    <tree path="/xxl-job-core" title="公共依赖"/>
+    <tree path="/xxl-job-executor-samples" title="示例"/>
+    <tree path="/xxl-job-admin/src/main/java/com/xxl/job/admin/core/thread/JobScheduleHelper.java" title="任务调度"/>
+    <tree path="/xxl-job-admin/src/main/java/com/xxl/job/admin/core/thread/JobLogReportHelper.java" title="日志报告"/>
+    <tree path="/xxl-job-admin/src/main/java/com/xxl/job/admin/core/thread/JobCompleteHelper.java" title="丢失监控"/>
+    <tree path="/xxl-job-admin/src/main/java/com/xxl/job/admin/core/thread/JobFailMonitorHelper.java" title="失败监控"/>
+    <tree path="/xxl-job-admin/src/main/java/com/xxl/job/admin/core/thread/JobRegistryHelper.java" title="注册监控"/>
+    <tree path="/xxl-job-admin/src/main/java/com/xxl/job/admin/core/thread/JobTriggerPoolHelper.java" title="触发池"/>
+</trees>
