@@ -83,8 +83,8 @@ public class JobTriggerPoolHelper
     // ---------------------- core ----------------------
 
     // job timeout count
-    private volatile long                                  minTim             = System.currentTimeMillis() / 60000;     // ms > min
-    private final    ConcurrentMap<Integer, AtomicInteger> jobTimeoutCountMap = new ConcurrentHashMap<>();
+    private volatile long                                  minTim             = System.currentTimeMillis() / 60000; // ms -> min
+    private final    ConcurrentMap<Integer, AtomicInteger> jobTimeoutCountMap = new ConcurrentHashMap<>();          // 每分钟清除
 
     /**
      * add trigger
@@ -125,7 +125,7 @@ public class JobTriggerPoolHelper
                     finally
                     {
                         // check timeout-count-map
-                        long minTim_now = System.currentTimeMillis() / 60000; // ms > min
+                        long minTim_now = System.currentTimeMillis() / 60000; // ms -> min
                         if (minTim != minTim_now)
                         {
                             minTim = minTim_now;

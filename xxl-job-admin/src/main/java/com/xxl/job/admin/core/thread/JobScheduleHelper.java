@@ -50,12 +50,12 @@ public class JobScheduleHelper
          * [1] 加行级锁
          * [2] 预读
          * [3] 推送至时间轮
-         *     [3.1] 过期 > 5s：跳过 OR 立即触发 -> 生成下个触发点
-         *     [3.2] 过期 < 5s：直接触发 + 生成下个触发点 -> 下个触发时间在当前 5 秒内则推送至时间轮 + 生成下个触发点
+         *     [3.1] 过期 > 5s: 跳过 OR 立即触发 -> 生成下个触发点
+         *     [3.2] 过期 < 5s: 直接触发 + 生成下个触发点 -> 下个触发时间在当前 5 秒内则推送至时间轮 + 生成下个触发点
          *     [3.3] 推送至时间轮 -> 生成下个触发点
          * [4] 更新触发信息
          * [5] 关闭资源
-         * [6] 预读成功 > 每秒扫描一次; 预读失败 > 跳过这个周期;
+         * [6] 预读成功 -> 每秒扫描一次; 预读失败 -> 跳过这个周期;
          */
         scheduleThread = new Thread(
                 () ->
@@ -88,7 +88,7 @@ public class JobScheduleHelper
                         Boolean           connAutoCommit    = null;
                         PreparedStatement preparedStatement = null;
 
-                        boolean preReadSuc = true;
+                        boolean preReadSuc = true; // 预读成功 ?
                         try
                         {
                             conn           = XxlJobAdminConfig.getAdminConfig().getDataSource().getConnection();
@@ -112,8 +112,8 @@ public class JobScheduleHelper
                                     // time-ring jump
                                     if (nowTime > jobInfo.getTriggerNextTime() + PRE_READ_MS)
                                     {
-                                        // 2.1、trigger-expire > 5s：pass && make next-trigger-time
-                                        // 过期 > 5s：跳过 && 生成下一个触发时间
+                                        // 2.1、trigger-expire > 5s: pass && make next-trigger-time
+                                        // 过期 > 5s: 跳过 && 生成下一个触发时间
                                         logger.warn(">>>>>>>>>>> xxl-job, schedule misfire, jobId = {}", jobInfo.getId());
 
                                         // 1、misfire match
@@ -130,8 +130,8 @@ public class JobScheduleHelper
                                     }
                                     else if (nowTime > jobInfo.getTriggerNextTime())
                                     {
-                                        // 2.2、trigger-expire < 5s：direct-trigger && make next-trigger-time
-                                        // 过期 < 5s：直接触发 && 生成下一个触发时间
+                                        // 2.2、trigger-expire < 5s: direct-trigger && make next-trigger-time
+                                        // 过期 < 5s: 直接触发 && 生成下一个触发时间
 
                                         // 1、trigger
                                         JobTriggerPoolHelper.trigger(jobInfo.getId(), TriggerTypeEnum.CRON, -1, null, null, null);
@@ -155,8 +155,8 @@ public class JobScheduleHelper
                                     }
                                     else
                                     {
-                                        // 2.3、trigger-pre-read：time-ring trigger && make next-trigger-time
-                                        // 未过期：时间轮触发 && 生成下一个触发时间
+                                        // 2.3、trigger-pre-read: time-ring trigger && make next-trigger-time
+                                        // 未过期: 时间轮触发 && 生成下一个触发时间
 
                                         // 1、make ring second
                                         int ringSecond = (int) ((jobInfo.getTriggerNextTime() / 1000) % 60);
@@ -261,7 +261,7 @@ public class JobScheduleHelper
                             try
                             {
                                 // pre-read period: success > scan each second; fail > skip this period;
-                                // 预读成功 > 每秒扫描一次; 预读失败 > 跳过这个周期;
+                                // 预读成功 -> 每秒扫描一次; 预读失败 -> 跳过这个周期;
                                 TimeUnit.MILLISECONDS.sleep((preReadSuc ? 1000 : PRE_READ_MS) - System.currentTimeMillis() % 1000);
                             }
                             catch (InterruptedException e)
